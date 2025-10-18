@@ -15,14 +15,14 @@ def main():
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406],  # mean и std ImageNet
-                            [0.229, 0.224, 0.225])
+                             [0.229, 0.224, 0.225])
     ])
 
     train_dataset = datasets.ImageFolder('data/frames/train', transform=transform)
     val_dataset = datasets.ImageFolder('data/frames/val', transform=transform)
 
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=32)
+    train_loader = DataLoader(train_dataset, batch_size=256, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=256)
 
     model = models.resnet18(pretrained=True)
 
@@ -31,7 +31,7 @@ def main():
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-4)
+    optimizer = optim.Adam(model.parameters(), lr=1e-5)
 
     num_epochs = 10
     for epoch in tqdm(range(num_epochs)):
@@ -49,6 +49,8 @@ def main():
             loss.backward()
             optimizer.step()
 
+            print(loss)
+
             running_loss += loss.item() * images.size(0)
             _, preds = torch.max(outputs, 1)
             correct += (preds == labels).sum().item()
@@ -57,7 +59,6 @@ def main():
         epoch_loss = running_loss / total
         epoch_acc = correct / total
 
-        # --- Валидация после каждой эпохи ---
         model.eval()
         val_correct = 0
         val_total = 0
