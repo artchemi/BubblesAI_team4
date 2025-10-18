@@ -18,3 +18,12 @@ main/
 │    ├──
 
 ```
+
+## Task 2
+
+To obtain frames from videos:
+
+```bash
+python src/extract_frames
+```
+
