@@ -24,6 +24,6 @@ main/
 To obtain frames from videos:
 
 ```bash
-python src/extract_frames
+python src/extract_frames.py
 ```
 
