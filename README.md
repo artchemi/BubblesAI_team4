@@ -14,5 +14,7 @@ main/
 │         └── class_i/
 ├── src
 │    ├── extract_frames.py    # Extract frames from videos                          
+│    ├── train_resnet.py      
+│    ├──
 
 ```
