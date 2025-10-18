@@ -49,9 +49,8 @@ def main():
             index += 1
 
         cap.release()
-        print(f"Extracted {len(frames_list)} non-black frames for {class_name}")
 
-        train_files, val_files, test_files = split_files(frames_list, train_ratio=TRAIN_RATIO, val_ratio=VAL_RATIO)    # разделение
+        train_files, val_files, test_files = split_files(frames_list, train_ratio=TRAIN_RATIO, val_ratio=VAL_RATIO, n_samples=500)    # разделение
 
         for subset_name, subset_files in zip(["train", "val", "test"], [train_files, val_files, test_files]):
             subset_class_dir = os.path.join(FOLDER_FRAMES, subset_name, class_name)
@@ -59,7 +58,7 @@ def main():
             for j, frame in enumerate(subset_files):
                 cv2.imwrite(os.path.join(subset_class_dir, f"frame{j}.jpg"), frame)
 
-        print(f"Saved frames for class {i} into train/val/test")
 
 if __name__ == "__main__":
     main()
+    

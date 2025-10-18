@@ -13,7 +13,10 @@ def is_black_frame(frame: np.ndarray, threshold: float) -> bool:
     mean_brightness = np.mean(gray)/255.0    # нормируем до [0,1]
     return mean_brightness < threshold
 
-def split_files(file_list: List[str], train_ratio: float, val_ratio: float) -> Tuple[List[str], List[str], List[str]]:
+def split_files(file_list: List[str], train_ratio: float, val_ratio: float, n_samples: int) -> Tuple[List[str], List[str], List[str]]:
+    if n_samples < len(file_list):
+        file_list = random.sample(file_list, n_samples)
+
     random.shuffle(file_list)
     n_total = len(file_list)
     n_train = int(train_ratio * n_total)

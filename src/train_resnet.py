@@ -21,8 +21,8 @@ def main():
     train_dataset = datasets.ImageFolder('data/frames/train', transform=transform)
     val_dataset = datasets.ImageFolder('data/frames/val', transform=transform)
 
-    train_loader = DataLoader(train_dataset, batch_size=256, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=256)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=32)
 
     model = models.resnet18(pretrained=True)
 
