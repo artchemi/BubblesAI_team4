@@ -1,6 +1,3 @@
-import os
-import shutil
-
 import cv2
 import random
 import numpy as np
@@ -10,7 +7,11 @@ from torch import nn
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 
+from sklearn.metrics import classification_report
+
 from typing import List, Tuple
+
+TARGET_NAMES = ["0%", "5%", "12.5%", "25%", "50%", "75%", "100%"]
 
 
 def is_black_frame(frame: np.ndarray, threshold: float) -> bool:
@@ -18,22 +19,20 @@ def is_black_frame(frame: np.ndarray, threshold: float) -> bool:
     mean_brightness = np.mean(gray)/255.0    # нормируем до [0,1]
     return mean_brightness < threshold
 
-def split_files(file_list: List[str], train_ratio: float, val_ratio: float, 
-                n_samples: int) -> Tuple[List[str], List[str], List[str]]:
-    if n_samples < len(file_list):
+def split_files(file_list: List[str], train_ratio: float, n_samples: int) -> Tuple[List[str], List[str], List[str]]:
+    if n_samples is not None and n_samples < len(file_list):
         file_list = random.sample(file_list, n_samples)
 
     random.shuffle(file_list)
     n_total = len(file_list)
     n_train = int(train_ratio * n_total)
-    n_val = int(val_ratio * n_total)
     train_files = file_list[:n_train]
-    val_files = file_list[n_train:n_train+n_val]
-    test_files = file_list[n_train+n_val:]
-    return train_files, val_files, test_files
+    test_files = file_list[n_train:]
+    return train_files, test_files
 
 def train_epoch(model: nn.Module, loader: DataLoader, criterion: nn.Module, 
                 optimizer: Optimizer, device: torch.device) -> Tuple[float, float]:
+    torch.cuda.empty_cache()
     model.train()
     running_loss, correct, total = 0.0, 0, 0
 
@@ -55,12 +54,19 @@ def train_epoch(model: nn.Module, loader: DataLoader, criterion: nn.Module,
 
 def evaluate(model: nn.Module, loader: DataLoader, device: torch.device) -> float:
     model.eval()
-    correct, total = 0, 0
+    all_preds = []
+    all_labels = []
+
     with torch.no_grad():
         for images, labels in loader:
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
-            _, preds = torch.max(outputs, 1)
-            correct += (preds == labels).sum().item()
-            total += labels.size(0)
-    return correct / total
+            preds = outputs.argmax(dim=1)
+
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+
+    accuracy = (torch.tensor(all_preds) == torch.tensor(all_labels)).float().mean().item()
+    report = classification_report(all_labels, all_preds, target_names=TARGET_NAMES, digits=4)
+
+    return accuracy, report
