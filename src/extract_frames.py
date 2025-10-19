@@ -7,15 +7,14 @@ import numpy as np
 from tqdm import tqdm
 from typing import List, Tuple
 
-from utils import *
+from utils import is_black_frame, split_files
 
 
 FOLDER_RAW = "data/raw_data/"     # путь до папки с архивом 
 FOLDER_FRAMES = "data/frames/"    # путь до папки с фреймами
 IMAGE_SIZE = (224, 224)           # нужный размер изображений
-BRIGHTNESS_THRESHOLD = 0.1        # порог яркости, чтобы обрезать черные фреймы
+BRIGHTNESS_THRESHOLD = 0.1       #? порог яркости, чтобы обрезать черные фреймы
 TRAIN_RATIO = 0.7
-VAL_RATIO = 0.15
 SEED = 42
 
 random.seed(SEED)
@@ -25,7 +24,7 @@ def main():
     with zipfile.ZipFile(f"{FOLDER_RAW}5952179.zip", 'r') as zip_ref:    #? можно добавить загрузку с облака
         zip_ref.extractall(FOLDER_RAW)
 
-    for subset in ["train", "val", "test"]:    # структура папок для фреймов
+    for subset in ["train", "test"]:    # структура папок для фреймов
         subset_path = os.path.join(FOLDER_FRAMES, subset)
         os.makedirs(subset_path, exist_ok=True)
 
@@ -50,9 +49,9 @@ def main():
 
         cap.release()
 
-        train_files, val_files, test_files = split_files(frames_list, train_ratio=TRAIN_RATIO, val_ratio=VAL_RATIO, n_samples=500)    # разделение
+        train_files, test_files = split_files(frames_list, train_ratio=TRAIN_RATIO, n_samples=None)    # разделение
 
-        for subset_name, subset_files in zip(["train", "val", "test"], [train_files, val_files, test_files]):
+        for subset_name, subset_files in zip(["train", "test"], [train_files,  test_files]):
             subset_class_dir = os.path.join(FOLDER_FRAMES, subset_name, class_name)
             os.makedirs(subset_class_dir, exist_ok=True)
             for j, frame in enumerate(subset_files):
