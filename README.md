@@ -1,29 +1,23 @@
 # BubblesAI_team4
 Tasks for the coursework
 
-## Project structure
+## Coursework structure
 
 ```markdown
 main/
 │
 ├── data/
-│    ├── raw_data/    
-│    │    └── .zip    # Archive with videos
-│    │
-│    └── frames/   
-│         └── class_i/
+│    └──  raw_data/    
+│         └── .zip    # Archive with videos
+│    
 ├── src
-│    ├── extract_frames.py    # Extract frames from videos                          
-│    ├── train_resnet.py      
-│    ├──
-
+│    ├── 2_3_extract_frames.py    # Extract frames from videos 
+│    ├── 4_....py                         
+│    ├── 5_ml.py                         
+│    ├── 6_train_mobilenet.py      
+│    ├── 6_train_resnet.py
+│    └── utils.py
+│
+├── README.md
+└── requirements.txt
 ```
-
-## Task 2
-
-To obtain frames from videos:
-
-```bash
-python src/extract_frames.py
-```
-
